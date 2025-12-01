@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 
 /**
  * Badge Component - Atomic Design
@@ -27,12 +27,70 @@ export const Badge = ({ children, variant = 'default', className = '', onClick }
 };
 
 /**
- * Tag Component - Clickable badge for tag selection
+ * Tag Component - Clickable badge for tag selection with context menu support
  */
-export const Tag = ({ children, onClick, className = '' }) => {
+export const Tag = ({
+  children,
+  onClick,
+  onContextMenu,
+  className = ''
+}) => {
+  const longPressTimerRef = useRef(null);
+  const [isLongPress, setIsLongPress] = useState(false);
+
+  const handleTouchStart = (e) => {
+    setIsLongPress(false);
+    longPressTimerRef.current = setTimeout(() => {
+      setIsLongPress(true);
+      if (onContextMenu) {
+        const touch = e.touches[0];
+        const syntheticEvent = {
+          preventDefault: () => e.preventDefault(),
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+        };
+        onContextMenu(syntheticEvent);
+      }
+    }, 500); // 500ms long press duration
+  };
+
+  const handleTouchEnd = (e) => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+    }
+    if (!isLongPress && onClick) {
+      onClick(e);
+    }
+    setIsLongPress(false);
+  };
+
+  const handleTouchMove = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+    }
+    setIsLongPress(false);
+  };
+
+  const handleClick = (e) => {
+    if (!isLongPress && onClick) {
+      onClick(e);
+    }
+  };
+
+  const handleContextMenu = (e) => {
+    e.preventDefault();
+    if (onContextMenu) {
+      onContextMenu(e);
+    }
+  };
+
   return (
     <button
-      onClick={onClick}
+      onClick={handleClick}
+      onContextMenu={handleContextMenu}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchMove={handleTouchMove}
       className={`text-xs px-2 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded hover:border-indigo-500 dark:hover:border-indigo-500 hover:text-indigo-500 transition-all shadow-sm ${className}`}
     >
       {children}

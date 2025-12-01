@@ -22,3 +22,16 @@ export const GROK_HELPER_BADGES = [
   "News Style",
   "Code Snippet"
 ];
+
+export const MIDJOURNEY_CATEGORIES = {
+  custom: ['My Custom Style', 'Signature Look'],
+  aspectRatio: ['--ar 16:9', '--ar 1:1', '--ar 4:3', '--ar 3:2', '--ar 21:9', '--ar 9:16', '--ar 2:3', '--ar 4:5'],
+  style: ['--style raw', '--style 4a', '--style 4b', '--style 4c', '--stylize 0', '--stylize 50', '--stylize 100', '--stylize 250', '--stylize 500', '--stylize 750', '--stylize 1000'],
+  quality: ['--quality 0.25', '--quality 0.5', '--quality 1', '--quality 2', '--hd'],
+  version: ['--v 6', '--v 6.1', '--v 5.2', '--v 5.1', '--v 5', '--niji 6', '--niji 5'],
+  other: ['--tile', '--chaos 0', '--chaos 25', '--chaos 50', '--chaos 75', '--chaos 100', '--weird 0', '--weird 250', '--weird 500', '--weird 1000'],
+  subject: ['portrait', 'landscape', 'cityscape', 'abstract', 'character design', 'product photography', 'architecture'],
+  artStyle: ['photorealistic', 'anime', 'oil painting', 'watercolor', 'digital art', 'concept art', '3D render', 'pixel art', 'sketch', 'comic book'],
+  lighting: ['golden hour', 'studio lighting', 'natural light', 'dramatic lighting', 'neon lights', 'volumetric lighting', 'backlit', 'rim lighting'],
+  camera: ['close-up', 'wide angle', 'aerial view', 'macro', 'telephoto', 'fisheye', 'bokeh', 'shallow depth of field']
+};
