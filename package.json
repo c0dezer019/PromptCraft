@@ -1,0 +1,46 @@
+{
+  "name": "promptcraft",
+  "version": "1.0.0",
+  "description": "Professional AI Prompt Engineering Suite - Built with Atomic Design Principles",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/c0dezer019/PromptCraft.git"
+  },
+  "homepage": "https://c0dezer019.github.io/PromptCraft",
+  "keywords": [
+    "prompt-engineering",
+    "ai",
+    "sora",
+    "veo",
+    "grok",
+    "stable-diffusion",
+    "comfyui",
+    "react",
+    "atomic-design"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "lucide-react": "^0.462.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.4.20",
+    "gh-pages": "^6.2.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "vite": "^5.4.11"
+  }
+}

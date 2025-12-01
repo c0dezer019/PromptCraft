@@ -6,7 +6,10 @@ A powerful, modular React application for crafting prompts across multiple AI pl
 
 [![React](https://img.shields.io/badge/React-18+-blue.svg)](https://reactjs.org/)
 [![Atomic Design](https://img.shields.io/badge/Architecture-Atomic%20Design-green.svg)](https://atomicdesign.bradfrost.com/)
+[![Deploy Status](https://github.com/c0dezer019/PromptCraft/actions/workflows/deploy.yml/badge.svg)](https://github.com/c0dezer019/PromptCraft/actions/workflows/deploy.yml)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+🚀 **[Live Demo →](https://c0dezer019.github.io/PromptCraft/)**
 
 ---
 
@@ -110,6 +113,7 @@ function MyApp() {
 | **[ATOMIC_STRUCTURE.md](ATOMIC_STRUCTURE.md)** | Complete architecture guide with component hierarchy |
 | **[MIGRATION_GUIDE.md](MIGRATION_GUIDE.md)** | How to use the atomic structure |
 | **[REFACTOR_SUMMARY.md](REFACTOR_SUMMARY.md)** | Overview of refactoring changes |
+| **[DEPLOYMENT.md](DEPLOYMENT.md)** | GitHub Pages deployment guide |
 
 ---
 
