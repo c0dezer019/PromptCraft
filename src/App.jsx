@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from './components/templates/MainLayout';
 import { SettingsModal, VideoBuilder, GrokBuilder, SDBuilder } from './components/organisms';
+import { MidjourneyBuilder } from './components/organisms/MidjourneyBuilder';
 import { usePromptManager, useDraggable, useHistory } from './hooks';
 import { exportPromptToMarkdown, copyToClipboard } from './utils/exportHelper';
 
@@ -13,7 +14,15 @@ export default function PromptCraft() {
   const [showSettings, setShowSettings] = useState(false);
 
   // Custom Hooks
-  const { prompts, updatePrompt, clearPrompt, getCurrentPromptText } = usePromptManager();
+  const {
+    prompts,
+    updatePrompt,
+    clearPrompt,
+    getCurrentPromptText,
+    deleteEnhancer,
+    editEnhancer,
+    syncEnhancerAcrossBuilders
+  } = usePromptManager();
   const { footerHeight, setFooterHeight } = useDraggable(85);
   const { history, addToHistory } = useHistory();
 
@@ -75,6 +84,9 @@ export default function PromptCraft() {
             setPrompt={(val) => updatePrompt('sora', 'main', val)}
             modifiers={prompts.sora.modifiers}
             setModifiers={(val) => updatePrompt('sora', 'modifiers', val)}
+            deleteEnhancer={deleteEnhancer}
+            editEnhancer={editEnhancer}
+            syncEnhancer={syncEnhancerAcrossBuilders}
           />
         )}
 
@@ -85,6 +97,9 @@ export default function PromptCraft() {
             setPrompt={(val) => updatePrompt('veo', 'main', val)}
             modifiers={prompts.veo.modifiers}
             setModifiers={(val) => updatePrompt('veo', 'modifiers', val)}
+            deleteEnhancer={deleteEnhancer}
+            editEnhancer={editEnhancer}
+            syncEnhancer={syncEnhancerAcrossBuilders}
           />
         )}
 
@@ -92,6 +107,18 @@ export default function PromptCraft() {
           <GrokBuilder
             prompt={prompts.grok.main}
             setPrompt={(val) => updatePrompt('grok', 'main', val)}
+          />
+        )}
+
+        {activeTool === 'midjourney' && (
+          <MidjourneyBuilder
+            prompt={prompts.midjourney.main}
+            setPrompt={(val) => updatePrompt('midjourney', 'main', val)}
+            modifiers={prompts.midjourney.modifiers}
+            setModifiers={(val) => updatePrompt('midjourney', 'modifiers', val)}
+            deleteEnhancer={deleteEnhancer}
+            editEnhancer={editEnhancer}
+            syncEnhancer={syncEnhancerAcrossBuilders}
           />
         )}
 
@@ -108,6 +135,9 @@ export default function PromptCraft() {
             setNodes={(val) => updatePrompt(activeTool, 'nodes', val)}
             params={prompts[activeTool].params}
             setParams={(val) => updatePrompt(activeTool, 'params', val)}
+            deleteEnhancer={deleteEnhancer}
+            editEnhancer={editEnhancer}
+            syncEnhancer={syncEnhancerAcrossBuilders}
           />
         )}
       </MainLayout>

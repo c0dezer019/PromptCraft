@@ -21,6 +21,9 @@ import { callAI } from '../../../utils/aiApi';
  * @param {function} setNodes - Nodes setter (optional)
  * @param {object} params - A1111 params (optional)
  * @param {function} setParams - Params setter (optional)
+ * @param {function} deleteEnhancer - Function to delete an enhancer
+ * @param {function} editEnhancer - Function to edit an enhancer
+ * @param {function} syncEnhancer - Function to sync enhancer across builders
  */
 export const SDBuilder = ({
   type,
@@ -33,7 +36,10 @@ export const SDBuilder = ({
   nodes,
   setNodes,
   params,
-  setParams
+  setParams,
+  deleteEnhancer,
+  editEnhancer,
+  syncEnhancer
 }) => {
   const isComfy = type === 'comfy';
   const [activeField, setActiveField] = useState('positive');
@@ -47,6 +53,26 @@ export const SDBuilder = ({
       ...prev,
       [category]: [...prev[category], newTag]
     }));
+  };
+
+  const handleDeleteCategory = (category, tag, index) => {
+    setCategories(prev => ({
+      ...prev,
+      [category]: prev[category].filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleEditCategory = (category, oldTag, newTag, index) => {
+    setCategories(prev => ({
+      ...prev,
+      [category]: prev[category].map((tag, i) => (i === index ? newTag : tag))
+    }));
+  };
+
+  const handleSyncTag = (tag) => {
+    if (syncEnhancer) {
+      syncEnhancer(tag, type);
+    }
   };
 
   const handleEnhanceSD = async (target) => {
@@ -341,6 +367,9 @@ export const SDBuilder = ({
               tags={tags}
               onSelect={addTag}
               onAdd={(newTag) => handleAddTagToCategory(key, newTag)}
+              onDelete={(tag, index) => handleDeleteCategory(key, tag, index)}
+              onEdit={(oldTag, newTag, index) => handleEditCategory(key, oldTag, newTag, index)}
+              onSync={handleSyncTag}
             />
           ))}
         </div>
