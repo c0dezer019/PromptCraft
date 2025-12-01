@@ -1,10 +1,14 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+// Determine base path based on environment
+const isGitHubPages = process.env.GITHUB_ACTIONS === 'true';
+const base = isGitHubPages ? '/PromptCraft/' : '/';
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/PromptCraft/',
+  base: base,
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
