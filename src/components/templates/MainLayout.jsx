@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Wand2, Settings, Sun, Zap, FileText, Trash2 } from 'lucide-react';
 import { IconButton } from '../atoms';
-import { Sidebar, MobileNav, PromptFooter } from '../organisms';
+import { Sidebar, MobileNav } from '../organisms';
 import { NAV_ITEMS, TOOL_DESCRIPTIONS } from '../../constants/navItems';
 
 /**
@@ -13,12 +13,8 @@ import { NAV_ITEMS, TOOL_DESCRIPTIONS } from '../../constants/navItems';
  * @param {boolean} darkMode - Dark mode state
  * @param {function} toggleDarkMode - Dark mode toggle
  * @param {function} openSettings - Settings modal opener
- * @param {string} finalPromptText - Final prompt output
- * @param {function} onCopy - Copy handler
  * @param {function} onExport - Export handler
  * @param {function} onClear - Clear handler
- * @param {number} footerHeight - Footer height
- * @param {function} setFooterHeight - Footer height setter
  */
 export const MainLayout = ({
   children,
@@ -28,12 +24,8 @@ export const MainLayout = ({
   darkMode,
   toggleDarkMode,
   openSettings,
-  finalPromptText,
-  onCopy,
   onExport,
-  onClear,
-  footerHeight,
-  setFooterHeight
+  onClear
 }) => {
   const currentTool = NAV_ITEMS.find(n => n.id === activeTool);
   const toolDescription = TOOL_DESCRIPTIONS[activeTool];
@@ -64,7 +56,7 @@ export const MainLayout = ({
 
         {/* Content Area */}
         <main className="flex-1 flex flex-col overflow-hidden relative">
-          <div className="flex-1 overflow-y-auto p-4 lg:p-8 pt-32 md:pt-8 pb-32 md:pb-8">
+          <div className="flex-1 overflow-y-auto p-4 lg:p-8 pt-32 md:pt-8">
             <div className="max-w-6xl mx-auto">
               {/* Tool Header */}
               <div className="mb-6 md:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -101,19 +93,8 @@ export const MainLayout = ({
 
               {/* Builder Content */}
               {children}
-
-              {/* Bottom spacer for footer */}
-              <div className="h-32 md:h-32"></div>
             </div>
           </div>
-
-          {/* Persistent Prompt Output Footer */}
-          <PromptFooter
-            finalPromptText={finalPromptText}
-            footerHeight={footerHeight}
-            setFooterHeight={setFooterHeight}
-            onCopy={onCopy}
-          />
         </main>
       </div>
     </div>

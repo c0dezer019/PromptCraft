@@ -48,7 +48,7 @@ export const PromptFooter = ({
     }
   };
 
-  const isCollapsed = typeof footerHeight === 'number' && footerHeight < 120;
+  const isCollapsed = window.innerWidth < 768 && typeof footerHeight === 'number' && footerHeight < 120;
 
   return (
     <div

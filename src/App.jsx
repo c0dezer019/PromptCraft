@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { MainLayout } from './components/templates/MainLayout';
 import { SettingsModal, VideoBuilder, GrokBuilder, SDBuilder } from './components/organisms';
 import { MidjourneyBuilder } from './components/organisms/MidjourneyBuilder';
 import { usePromptManager, useDraggable, useHistory } from './hooks';
-import { exportPromptToMarkdown, copyToClipboard } from './utils/exportHelper';
+import { exportPromptToMarkdown, copyToClipboard, exportComfyWorkflow, exportA1111Text } from './utils/exportHelper';
 
 /**
  * Main PromptCraft Application
@@ -45,8 +45,14 @@ export default function PromptCraft() {
   };
 
   const handleExport = () => {
-    const text = getCurrentPromptText(activeTool);
-    exportPromptToMarkdown(activeTool, prompts[activeTool], text);
+    if (activeTool === 'comfy') {
+      exportComfyWorkflow(prompts.comfy);
+    } else if (activeTool === 'a1111') {
+      exportA1111Text(prompts.a1111);
+    } else {
+      const text = getCurrentPromptText(activeTool);
+      exportPromptToMarkdown(activeTool, prompts[activeTool], text);
+    }
   };
 
   const handleClear = () => {

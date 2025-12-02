@@ -11,7 +11,7 @@ export const SectionHeader = ({ icon: Icon, title, resetAction, extra }) => (
       <h3 className="font-semibold text-sm uppercase tracking-wider">{title}</h3>
     </div>
     <div className="flex items-center gap-2">
-      {extra}
+            {extra}
       {resetAction && (
         <button
           onClick={resetAction}

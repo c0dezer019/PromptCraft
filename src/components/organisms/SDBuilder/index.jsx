@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { Palette, X, Layers, Sparkles, Workflow, Plus } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Palette, X, Layers, Workflow, Plus, Upload, Link2 } from 'lucide-react';
 import { TextArea } from '../../atoms';
-import { SectionHeader, TagGroup, EnhanceButton } from '../../molecules';
+import { SectionHeader, TagGroup, EnhanceButton, FileDropZone, ImportDialog, URLImportDialog } from '../../molecules';
 import { ComfyNode } from './ComfyNode';
 import { A1111Params } from './A1111Params';
 import { SD_CATEGORIES } from '../../../constants/tagCategories';
 import { NODE_TEMPLATES } from '../../../constants/nodeTemplates';
 import { callAI } from '../../../utils/aiApi';
+import { useWorkflowImport } from '../../../hooks/useWorkflowImport';
 
 /**
  * SDBuilder Component - For Stable Diffusion (A1111 / ComfyUI)
@@ -47,6 +48,34 @@ export const SDBuilder = ({
   const [isEnhancingNeg, setIsEnhancingNeg] = useState(false);
   const [showNodeMenu, setShowNodeMenu] = useState(false);
   const [categories, setCategories] = useState(SD_CATEGORIES);
+  const nodeMenuRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (nodeMenuRef.current && !nodeMenuRef.current.contains(event.target)) {
+        setShowNodeMenu(false);
+      }
+    };
+
+    if (showNodeMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showNodeMenu]);
+
+  // Workflow Import Hook
+  const {
+    importDialogOpen,
+    urlDialogOpen,
+    importData,
+    importError,
+    importMode,
+    handleFileSelect,
+    handleURLFetch,
+    setUrlDialogOpen,
+    resetImport
+  } = useWorkflowImport();
 
   const handleAddTagToCategory = (category, newTag) => {
     setCategories(prev => ({
@@ -161,11 +190,14 @@ export const SDBuilder = ({
 
   // Custom Node: Add new field
   const addCustomField = (nodeId) => {
-    const fieldName = prompt("Enter field name (e.g. 'steps', 'model_name'):");
+    console.log('🔧 Add custom field clicked for node:', nodeId);
+    const fieldName = window.prompt("Enter field name (e.g. 'steps', 'model_name'):");
+    console.log('🔧 Field name entered:', fieldName);
     if (!fieldName) return;
 
     setNodes(nodes.map(n => {
       if (n.id === nodeId) {
+        console.log('🔧 Adding field to node:', n.title);
         return {
           ...n,
           fields: {
@@ -178,10 +210,90 @@ export const SDBuilder = ({
     }));
   };
 
+  // Handle workflow import
+  const handleImport = (action) => {
+    console.log('🎯 Import action:', action, 'Data:', importData);
+    if (!importData) return;
+
+    if (action === 'replace') {
+      console.log('🔄 Replacing workflow...');
+      // Replace all fields
+      if (importData.prompt !== undefined) {
+        console.log('Setting prompt:', importData.prompt);
+        setPrompt(importData.prompt);
+      }
+      if (importData.negativePrompt !== undefined) {
+        console.log('Setting negative prompt:', importData.negativePrompt);
+        setNegativePrompt(importData.negativePrompt);
+      }
+
+      if (type === 'a1111' && importData.params) {
+        console.log('Setting A1111 params:', importData.params);
+        setParams(importData.params);
+      }
+
+      if (type === 'comfy' && importData.nodes) {
+        console.log('Setting ComfyUI nodes:', importData.nodes);
+        setNodes(importData.nodes);
+      }
+    } else if (action === 'merge') {
+      console.log('🔀 Merging workflow...');
+      // Merge with existing
+      if (importData.prompt) {
+        setPrompt(prompt ? `${prompt}, ${importData.prompt}` : importData.prompt);
+      }
+      if (importData.negativePrompt) {
+        setNegativePrompt(negativePrompt ? `${negativePrompt}, ${importData.negativePrompt}` : importData.negativePrompt);
+      }
+
+      if (type === 'a1111' && importData.params) {
+        setParams({ ...params, ...importData.params });
+      }
+
+      if (type === 'comfy' && importData.nodes) {
+        setNodes([...nodes, ...importData.nodes]);
+      }
+    }
+
+    console.log('✅ Import complete');
+    resetImport();
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
+          {/* Import Controls */}
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 p-4 rounded-xl border-2 border-dashed border-indigo-300 dark:border-indigo-700">
+            <div className="flex items-center gap-2 mb-2">
+              <Upload size={16} className="text-indigo-600 dark:text-indigo-400" />
+              <h4 className="text-sm font-bold text-indigo-900 dark:text-indigo-300">
+                Import {isComfy ? 'ComfyUI' : 'Automatic1111'} Workflow
+              </h4>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+              {isComfy
+                ? 'Load a ComfyUI workflow JSON file to populate nodes and prompts'
+                : 'Load an A1111 image (PNG) or parameter file (TXT) to populate prompts and settings'
+              }
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <button
+                onClick={() => setUrlDialogOpen(true)}
+                className="text-xs flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white dark:bg-gray-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 rounded-lg transition-colors font-medium text-indigo-700 dark:text-indigo-300"
+              >
+                <Link2 size={14} /> Import from URL
+              </button>
+              <div className="flex-1">
+                <FileDropZone
+                  onFileSelect={(file) => handleFileSelect(file, type)}
+                  acceptedFormats={type === 'a1111' ? '.png,.txt' : '.json'}
+                  className="!p-3 !border-indigo-200 dark:!border-indigo-700 hover:!border-indigo-400 dark:hover:!border-indigo-500 !bg-white dark:!bg-gray-800"
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Positive Prompt */}
           <div
             className={`bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border transition-colors ${
@@ -282,7 +394,7 @@ export const SDBuilder = ({
                   <Workflow size={16} /> Workflow Nodes
                 </h4>
 
-                <div className="relative">
+                <div className="relative" ref={nodeMenuRef}>
                   <button
                     onClick={() => setShowNodeMenu(!showNodeMenu)}
                     className="text-xs flex items-center gap-1 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition shadow-sm"
@@ -291,7 +403,7 @@ export const SDBuilder = ({
                   </button>
 
                   {showNodeMenu && (
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 z-20">
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 z-50">
                       <div className="px-3 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700">
                         Core Nodes
                       </div>
@@ -374,6 +486,25 @@ export const SDBuilder = ({
           ))}
         </div>
       </div>
+
+      {/* Import Dialogs - Only render when actually open */}
+      {importDialogOpen && (
+        <ImportDialog
+          isOpen={importDialogOpen}
+          onClose={resetImport}
+          onImport={handleImport}
+          importData={importData}
+          error={importError}
+        />
+      )}
+
+      {urlDialogOpen && (
+        <URLImportDialog
+          isOpen={urlDialogOpen}
+          onClose={() => setUrlDialogOpen(false)}
+          onFetch={(url) => handleURLFetch(url, type)}
+        />
+      )}
     </div>
   );
 };
